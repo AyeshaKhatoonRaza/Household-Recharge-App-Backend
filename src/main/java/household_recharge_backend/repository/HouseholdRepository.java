@@ -5,7 +5,8 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
 
-public interface HouseholdRepository extends MongoRepository<Household, String> {
+public interface HouseholdRepository
+        extends MongoRepository<Household, String> {
 
-    List<Household> findByOwnerId(String ownerId);
+    List<Household> findByAuthId(String authId);
 }

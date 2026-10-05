@@ -16,16 +16,21 @@ public class HouseholdService {
     }
 
     // Create a household
-    public Household createHousehold(String name, String ownerId) {
+    public Household createHousehold(
+            String householdName,
+            String authId
+    ) {
 
-        Household household = new Household(name, ownerId);
+        Household household = new Household();
+        household.setAuthId(authId);
+        household.setHouseholdName(householdName);
 
         return householdRepository.save(household);
     }
 
-    // Get all households owned by a user
-    public List<Household> getHouseholdsByOwnerId(String ownerId) {
-        return householdRepository.findByOwnerId(ownerId);
+    public List<Household> getHouseholdsByAuthId(String authId) {
+
+        return householdRepository.findByAuthId(authId);
     }
 
     // Get household by ID

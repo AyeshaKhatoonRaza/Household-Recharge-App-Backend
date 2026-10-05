@@ -17,22 +17,24 @@ public class JwtService {
     private static final String SECRET_KEY =
             "mySuperSecretKeyForHouseholdRechargeApplication2026SecureKey";
 
-    private static final long EXPIRATION_TIME =
-            1000 * 60 * 60 * 24; // 24 hours
+    private static final long ACCESS_TOKEN_EXPIRATION_TIME =
+            1000 * 60 * 30; // 30 minutes
 
     private final SecretKey key = Keys.hmacShaKeyFor(
             SECRET_KEY.getBytes(StandardCharsets.UTF_8)
     );
 
-    public String generateToken(User user) {
+    public String generateAccessToken(User user) {
 
         return Jwts.builder()
                 .subject(user.getId())
                 .claim("mobileNumber", user.getMobileNumber())
                 .claim("name", user.getName())
+                .claim("tokenType", "access")
                 .issuedAt(new Date())
                 .expiration(new Date(
-                        System.currentTimeMillis() + EXPIRATION_TIME
+                        System.currentTimeMillis()
+                                + ACCESS_TOKEN_EXPIRATION_TIME
                 ))
                 .signWith(key)
                 .compact();

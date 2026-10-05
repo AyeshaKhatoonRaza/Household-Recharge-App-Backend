@@ -20,35 +20,34 @@ public class HouseholdController {
         this.householdService = householdService;
     }
 
-    // Create a household
     @PostMapping
     public ResponseEntity<Household> createHousehold(
             @RequestBody HouseholdRequest request,
             Authentication authentication
     ) {
 
-        String ownerId = authentication.getName();
+        String authId = authentication.getName();
 
-        Household household = householdService.createHousehold(
-                request.getName(),
-                ownerId
-        );
+        Household household =
+                householdService.createHousehold(
+                        request.getHouseholdName(),
+                        authId
+                );
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(household);
     }
 
-    // Get all households owned by the logged-in user
     @GetMapping
     public ResponseEntity<List<Household>> getMyHouseholds(
             Authentication authentication
     ) {
 
-        String ownerId = authentication.getName();
+        String authId = authentication.getName();
 
         List<Household> households =
-                householdService.getHouseholdsByOwnerId(ownerId);
+                householdService.getHouseholdsByAuthId(authId);
 
         return ResponseEntity.ok(households);
     }

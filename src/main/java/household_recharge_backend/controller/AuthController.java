@@ -11,6 +11,7 @@ import household_recharge_backend.dto.LoginRequest;
 import household_recharge_backend.dto.LoginResponse;
 import household_recharge_backend.service.JwtService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import household_recharge_backend.service.RefreshTokenService;
 
 @RestController
 @RequestMapping("/auth")
@@ -18,13 +19,16 @@ public class AuthController {
 
     private final UserService userService;
     private final JwtService jwtService;
+    private final RefreshTokenService refreshTokenService;
 
     public AuthController(
             UserService userService,
-            JwtService jwtService
+            JwtService jwtService,
+            RefreshTokenService refreshTokenService
     ) {
         this.userService = userService;
         this.jwtService = jwtService;
+        this.refreshTokenService = refreshTokenService;
     }
 
     @PostMapping("/signup")
@@ -61,10 +65,17 @@ public class AuthController {
             );
 
             // Generate JWT token
-            String accessToken = jwtService.generateToken(user);
+            String accessToken =
+                    jwtService.generateAccessToken(user);
+
+            String refreshToken =
+                    refreshTokenService.createRefreshToken(
+                            user.getId()
+                    );
 
             LoginResponse response = new LoginResponse(
                     accessToken,
+                    refreshToken,
                     user.getId(),
                     user.getName(),
                     user.getMobileNumber()
@@ -101,6 +112,62 @@ public class AuthController {
             return ResponseEntity
                     .badRequest()
                     .body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refresh(
+            @RequestBody RefreshRequest request
+    ) {
+
+        try {
+
+            String userId =
+                    refreshTokenService.validateAndGetUserId(
+                            request.getRefreshToken()
+                    );
+
+            User user =
+                    userService.getUserById(userId);
+
+            String newAccessToken =
+                    jwtService.generateAccessToken(user);
+
+            return ResponseEntity.ok(
+                    new RefreshResponse(newAccessToken)
+            );
+
+        } catch (RuntimeException e) {
+
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(e.getMessage());
+        }
+    }
+
+    public static class RefreshRequest {
+
+        private String refreshToken;
+
+        public String getRefreshToken() {
+            return refreshToken;
+        }
+
+        public void setRefreshToken(String refreshToken) {
+            this.refreshToken = refreshToken;
+        }
+    }
+
+    public static class RefreshResponse {
+
+        private String accessToken;
+
+        public RefreshResponse(String accessToken) {
+            this.accessToken = accessToken;
+        }
+
+        public String getAccessToken() {
+            return accessToken;
         }
     }
 }

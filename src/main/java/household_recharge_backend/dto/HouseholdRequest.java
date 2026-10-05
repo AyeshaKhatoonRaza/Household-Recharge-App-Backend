@@ -2,16 +2,16 @@ package household_recharge_backend.dto;
 
 public class HouseholdRequest {
 
-    private String name;
+    private String householdName;
 
     public HouseholdRequest() {
     }
 
-    public String getName() {
-        return name;
+    public String getHouseholdName() {
+        return householdName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setHouseholdName(String householdName) {
+        this.householdName = householdName;
     }
 }

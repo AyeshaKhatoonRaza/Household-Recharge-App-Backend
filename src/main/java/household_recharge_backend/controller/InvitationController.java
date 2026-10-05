@@ -24,31 +24,32 @@ public class InvitationController {
             Authentication authentication
     ) {
 
-        String invitedByUserId = authentication.getName();
+        String createdBy = authentication.getName();
 
-        Invitation invitation = invitationService.createInvitation(
-                request.getHouseholdId(),
-                request.getInvitedMobileNumber(),
-                invitedByUserId
-        );
+        Invitation invitation =
+                invitationService.createInvitation(
+                        request.getHouseholdId(),
+                        createdBy
+                );
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(invitation);
     }
 
-    @PostMapping("/{invitationId}/accept")
+    @PostMapping("/{code}/accept")
     public ResponseEntity<Invitation> acceptInvitation(
-            @PathVariable String invitationId,
+            @PathVariable String code,
             Authentication authentication
     ) {
 
-        String userId = authentication.getName();
+        String usedBy = authentication.getName();
 
-        Invitation invitation = invitationService.acceptInvitation(
-                invitationId,
-                userId
-        );
+        Invitation invitation =
+                invitationService.redeemInvitation(
+                        code,
+                        usedBy
+                );
 
         return ResponseEntity.ok(invitation);
     }
